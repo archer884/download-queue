@@ -1,0 +1,5 @@
+youtube-dl = '/usr/local/bin/youtube-dl'
+
+# The following parameters are optional.
+minimum-wait = 29
+maximum-wait = 54

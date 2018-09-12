@@ -1,0 +1,11 @@
+[package]
+name = "download-queue"
+version = "0.1.0"
+authors = ["J/A <archer884@gmail.com>"]
+
+[dependencies]
+dirs = "1.0"
+serde = "1.0"
+serde_derive = "1.0"
+structopt = "0.2"
+toml = "0.4"
