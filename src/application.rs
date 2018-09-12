@@ -1,4 +1,5 @@
 use config::*;
+use crossbeam;
 use download::Download;
 use error::*;
 use std::collections::{HashMap, HashSet};
@@ -14,22 +15,52 @@ impl Application {
     }
 
     pub fn run(self) -> Result<()> {
-        use std::fs;
+        use job::Job;
+        use std::fs::{self, OpenOptions};
+        use std::io::Write;
+        use std::sync::mpsc;
         use std::thread;
+        use stopwatch::Stopwatch;
 
         let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
         let segregated_queues = build_queues(queue.lines());
 
         format_job_stats(&segregated_queues);
+        let mut time = Stopwatch::start_new();
 
-        let mut jobs = Vec::new();
-        for (host, download_set) in segregated_queues.into_iter() {
-            jobs.push(thread::spawn(move || {
-                // Download damned files here.
-            }));
-        }
+        // FIXME: this represents an unbounded degree of concurrency. Such concurrency could prove
+        // to be a problem if we connect to too many hosts at once; individual downloads could 
+        // then take too long and time out. To limit this possibility, it may be best to process 
+        // a maximum number of hosts at any given time. I have no idea how to do that.
+        crossbeam::scope(|scope| {
+            let mut jobs = Vec::new();
+            let (tx, rx) = mpsc::channel();
 
-        jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
+            let logging = scope.spawn(|| {
+                for message in rx {
+                    let log = OpenOptions::new()
+                        .append(true)
+                        .write(true)
+                        .open(&self.config.log());
+
+                    // Yeah, just swallow the hell out of any errors...
+                    if let Ok(mut log) = log {
+                        let _ = write!(log, "{}", message);
+                    }
+                }
+            });
+
+            for (_host, download_set) in segregated_queues.into_iter() {
+                let tx = tx.clone();
+                jobs.push(thread::spawn(move || Job::new(tx, download_set).execute()));
+            }
+
+            jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
+            logging.join().expect("ugh logging");
+        });
+
+        time.stop();
+        println!("Jobs complete in: {:?}", time.elapsed());
         Ok(())
     }
 }

@@ -1,12 +1,14 @@
 use structopt::StructOpt;
 use error::*;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, StructOpt)]
 pub struct Command {
     /// Path to a list of files to be downloaded.
     pub path: String,
     /// Path to the folder where downloads will be stored.
+    /// 
+    /// Warning: not implemented.
     #[structopt(short = "d", long = "downloads")]
     pub downloads: Option<String>,
     /// Path to youtube-dl binary.
@@ -26,9 +28,11 @@ impl Command {
 /// Defines a set of default options.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    /// The default youtube-dl location.
+    /// The youtube-dl location.
     #[serde(rename = "youtube-dl")]
     pub youtube_dl: String,
+    /// The log file location.
+    pub log: Option<String>, 
     /// The minimum wait time.
     #[serde(rename = "minimum-wait")]
     pub min_wait: Option<u32>,
@@ -51,6 +55,13 @@ impl Config {
         let content = fs::read_to_string(path).map_err(Error::config)?;
         
         toml::from_str(&content).map_err(Error::config)
+    }
+
+    pub fn log(&self) -> PathBuf {
+        match self.log {
+            None => rehome("~/Documents/download-log.txt").expect("FIXME: quit being lazy"),
+            Some(ref path) => rehome(path).expect("FIXME: seriously, though"),
+        }
     }
 }
 
