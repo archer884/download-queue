@@ -1,20 +1,28 @@
 use std::error;
 use std::fmt::{self, Display};
 use std::result;
+use url;
 
 pub type Result<T> = result::Result<T, Error>;
 
 type Message = &'static str;
+type Cause = Box<error::Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    ConfigUnavailable(Box<error::Error>),
+    Config(Cause),
+    Schedule(Cause),
+    Url(Cause),
     Other(Message),
 }
 
 impl Error {
     pub fn config(e: impl error::Error + 'static) -> Self {
-        Error::ConfigUnavailable(Box::new(e))
+        Error::Config(Box::new(e))
+    }
+
+    pub fn schedule(e: impl error::Error + 'static) -> Self {
+        Error::Schedule(Box::new(e))
     }
 }
 
@@ -23,7 +31,9 @@ impl Display for Error {
         use self::Error::*;
 
         match *self {
-            ConfigUnavailable(ref error) => writeln!(f, "Configuration unavailable\n{}", error),    
+            Config(ref error) => writeln!(f, "Configuration unavailable: {}", error),    
+            Schedule(ref error) => writeln!(f, "Invalid schedule: {}", error),
+            Url(ref error) => writeln!(f, "Invalid url: {}", error),
             Other(message) => f.write_str(message),
         }
     }
@@ -32,5 +42,11 @@ impl Display for Error {
 impl From<Message> for Error {
     fn from(message: Message) -> Self {
         Error::Other(message)
+    }
+}
+
+impl From<url::ParseError> for Error {
+    fn from(e: url::ParseError) -> Self {
+        Error::Url(Box::new(e))
     }
 }

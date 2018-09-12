@@ -47,14 +47,14 @@ impl Config {
             .map(AsRef::as_ref)
             .unwrap_or("~/.download-queue");
 
-        let path = qualify(path)?;
+        let path = rehome(path)?;
         let content = fs::read_to_string(path).map_err(Error::config)?;
         
         toml::from_str(&content).map_err(Error::config)
     }
 }
 
-fn qualify(path: &str) -> Result<PathBuf> {
+fn rehome(path: &str) -> Result<PathBuf> {
     use dirs;
 
     if path.starts_with("~/") {
