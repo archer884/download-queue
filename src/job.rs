@@ -34,10 +34,9 @@ impl Job {
                 Ok(result) => {
                     if !result.status.success() {
                         eprintln!("Failed to download url:\n    {}", url);
-                        (log.lock()
-                            .expect("I sure hope this doesn't get poisoned..."))(
-                            &result.stderr
-                        );
+
+                        let log = log.lock().expect("Please don't get poisoned...");
+                        log(&result.stderr);
                     }
                 }
             }
