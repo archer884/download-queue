@@ -37,7 +37,7 @@ impl Job {
 
                 Ok(result) => {
                     if result.status.success() {
-                        print_success(url);
+                        print_success(item.idx, url);
                     } else {
                         print_error(item.idx, url);
                     }
