@@ -15,6 +15,7 @@ mod application;
 mod config;
 mod download;
 mod error;
+mod fmt;
 mod job;
 
 // Youtubed-dl location on macos

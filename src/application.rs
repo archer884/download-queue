@@ -3,6 +3,7 @@ use crossbeam;
 use download::Download;
 use error::*;
 use std::collections::{HashMap, HashSet};
+use fmt::FormatDuration;
 
 pub struct Application {
     config: Config,
@@ -17,13 +18,14 @@ impl Application {
     pub fn run(self) -> Result<()> {
         use job::Job;
         use std::fs;
-        use stopwatch::Stopwatch;
+        use std::time::Instant;
 
         let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
         let segregated_queues = build_queues(queue.lines());
 
         format_job_stats(&segregated_queues);
-        let mut time = Stopwatch::start_new();
+        
+        let start_time = Instant::now();
 
         // FIXME: this represents an unbounded degree of concurrency. Such concurrency could prove
         // to be a problem if we connect to too many hosts at once; individual downloads could
@@ -37,8 +39,8 @@ impl Application {
             jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
         });
 
-        time.stop();
-        println!("Jobs complete in: {:?}", time.elapsed());
+        let elapsed = Instant::now() - start_time;
+        println!("Jobs complete in: {}", elapsed.format());
         Ok(())
     }
 }
