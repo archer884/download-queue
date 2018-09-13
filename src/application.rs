@@ -60,7 +60,9 @@ fn build_queues<'a>(
 
     let items = items
         .into_iter()
-        .map(|url| (url.trim(), Download::from_url(url)));
+        .enumerate()
+        .map(|(idx, url)| (url.trim(), Download::with_index(idx, url)));
+        
     for (url, item) in items {
         match item {
             Err(e) => eprintln!("[Warn]: unable to parse url ({}):\n    {}", url, e),

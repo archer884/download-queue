@@ -38,7 +38,7 @@ impl Job {
                     if result.status.success() {
                         print_success(url);
                     } else {
-                        print_error(url);
+                        print_error(item.idx, url);
                     }
                 }
             }
@@ -57,7 +57,7 @@ fn print_success(url: &str) {
     println!(" {} {}", Local::now().format("%F %T"), url);
 }
 
-fn print_error(url: &str) {
+fn print_error(line: usize, url: &str) {
     {
         let mut stream = StandardStream::stderr(ColorChoice::Always);
         let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
@@ -65,7 +65,7 @@ fn print_error(url: &str) {
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
 
-    println!(" {} {}", Local::now().format("%F %T"), url);
+    println!(" {} (line {}) {}", Local::now().format("%F %T"), line, url);
 }
 
 struct Waiter {

@@ -1,14 +1,16 @@
 use error::Result;
 use url::Url;
+use std::hash::{Hash, Hasher};
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct Download {
-    host: String,
-    url: String,
+    pub idx: usize,
+    pub host: String,
+    pub url: String,
 }
 
 impl Download {
-    pub fn from_url(s: &str) -> Result<Self> {
+    pub fn with_index(idx: usize, s: &str) -> Result<Self> {
         let s = s.trim();
         let url = Url::parse(s)?;
         let host = url
@@ -18,6 +20,7 @@ impl Download {
             .to_owned();
 
         Ok(Download {
+            idx,
             host,
             url: s.to_owned(),
         })
@@ -32,15 +35,8 @@ impl Download {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use download::Download;
-
-    #[test]
-    fn it_works() {
-        let url = "http://www.contoso.com/corporate-event-video";
-        let result = Download::from_url(url).expect("Failed to read url");
-        assert_eq!("contoso.com", result.host());
-        assert_eq!(url, result.url());
+impl Hash for Download {
+    fn hash<H: Hasher>(&self, hasher: &mut H) {
+        self.url.hash(hasher);
     }
 }
