@@ -20,7 +20,7 @@ impl Download {
             .to_owned();
 
         Ok(Download {
-            idx,
+            idx: idx + 1, // Enumeration starts at 0, lines start at 1.
             host,
             url: s.to_owned(),
         })
