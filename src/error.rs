@@ -31,7 +31,7 @@ impl Display for Error {
         use self::Error::*;
 
         match *self {
-            Config(ref error) => writeln!(f, "Configuration unavailable: {}", error),    
+            Config(ref error) => writeln!(f, "Configuration unavailable: {}", error),
             Schedule(ref error) => writeln!(f, "Invalid schedule: {}", error),
             Url(ref error) => writeln!(f, "Invalid url: {}", error),
             Other(message) => f.write_str(message),

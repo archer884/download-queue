@@ -10,9 +10,9 @@ extern crate toml;
 extern crate url;
 
 mod application;
-mod error;
 mod config;
 mod download;
+mod error;
 mod job;
 
 // Youtubed-dl location on macos

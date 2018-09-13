@@ -11,7 +11,8 @@ impl Download {
     pub fn from_url(s: &str) -> Result<Self> {
         let s = s.trim();
         let url = Url::parse(s)?;
-        let host = url.host_str()
+        let host = url
+            .host_str()
             .ok_or("Unable to resolve host")?
             .trim_left_matches("www.")
             .to_owned();

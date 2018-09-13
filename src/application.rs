@@ -18,8 +18,7 @@ impl Application {
         use job::Job;
         use std::fs::{self, OpenOptions};
         use std::io::Write;
-        use std::sync::mpsc;
-        use std::thread;
+        use std::sync::{Arc, Mutex};
         use stopwatch::Stopwatch;
 
         let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
@@ -29,34 +28,27 @@ impl Application {
         let mut time = Stopwatch::start_new();
 
         // FIXME: this represents an unbounded degree of concurrency. Such concurrency could prove
-        // to be a problem if we connect to too many hosts at once; individual downloads could 
-        // then take too long and time out. To limit this possibility, it may be best to process 
+        // to be a problem if we connect to too many hosts at once; individual downloads could
+        // then take too long and time out. To limit this possibility, it may be best to process
         // a maximum number of hosts at any given time. I have no idea how to do that.
         crossbeam::scope(|scope| {
-            let mut jobs = Vec::new();
-            let (tx, rx) = mpsc::channel();
+            let log_path = self.config.log().to_owned();
+            let log = Arc::new(Mutex::new(move |message: &[u8]| {
+                let log = OpenOptions::new().append(true).write(true).open(&log_path);
 
-            let logging = scope.spawn(|| {
-                for message in rx {
-                    let log = OpenOptions::new()
-                        .append(true)
-                        .write(true)
-                        .open(&self.config.log());
-
-                    // Yeah, just swallow the hell out of any errors...
-                    if let Ok(mut log) = log {
-                        let _ = write!(log, "{}", message);
-                    }
+                if let Ok(mut log) = log {
+                    let _ = log.write_all(message);
                 }
-            });
+            }));
 
+            let mut jobs = Vec::new();
             for (_host, download_set) in segregated_queues.into_iter() {
-                let tx = tx.clone();
-                jobs.push(scope.spawn(|| Job::new(tx, download_set).execute(&self.config.youtube_dl)));
+                let log = log.clone();
+                jobs.push(
+                    scope.spawn(|| Job::new(download_set).execute(&self.config.youtube_dl, log)),
+                );
             }
-
             jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
-            logging.join().expect("ugh logging");
         });
 
         time.stop();
@@ -69,21 +61,31 @@ fn format_job_stats(job: &HashMap<String, HashSet<Download>>) {
     let host_count = job.keys().count();
     let total_count = job.values().count();
 
-    println!("Downloading {} files from {} hosts.", total_count, host_count);
+    println!(
+        "Downloading {} files from {} hosts.",
+        total_count, host_count
+    );
 }
 
-fn build_queues<'a>(items: impl IntoIterator<Item = &'a str>) -> HashMap<String, HashSet<Download>> {
+fn build_queues<'a>(
+    items: impl IntoIterator<Item = &'a str>,
+) -> HashMap<String, HashSet<Download>> {
     let mut segregated_queues: HashMap<_, HashSet<_>> = HashMap::new();
 
-    let items = items.into_iter().map(|url| (url.trim(), Download::from_url(url)));
+    let items = items
+        .into_iter()
+        .map(|url| (url.trim(), Download::from_url(url)));
     for (url, item) in items {
         match item {
             Err(e) => eprintln!("[Warn]: unable to parse url ({}):\n    {}", url, e),
             Ok(item) => {
-                segregated_queues.entry(item.host().to_owned()).or_default().insert(item);
+                segregated_queues
+                    .entry(item.host().to_owned())
+                    .or_default()
+                    .insert(item);
             }
         }
-    }    
+    }
 
     segregated_queues
 }
