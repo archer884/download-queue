@@ -2,8 +2,8 @@ use config::*;
 use crossbeam;
 use download::Download;
 use error::*;
-use std::collections::{HashMap, HashSet};
 use fmt::FormatDuration;
+use std::collections::{HashMap, HashSet};
 
 pub struct Application {
     config: Config,
@@ -24,7 +24,7 @@ impl Application {
         let segregated_queues = build_queues(queue.lines());
 
         format_job_stats(&segregated_queues);
-        
+
         let start_time = Instant::now();
 
         // FIXME: this represents an unbounded degree of concurrency. Such concurrency could prove
@@ -64,7 +64,7 @@ fn build_queues<'a>(
         .into_iter()
         .enumerate()
         .map(|(idx, url)| (url.trim(), Download::with_index(idx, url)));
-        
+
     for (url, item) in items {
         match item {
             Err(e) => eprintln!("[Warn]: unable to parse url ({}):\n    {}", url, e),

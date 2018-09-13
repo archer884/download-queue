@@ -1,6 +1,6 @@
 use error::Result;
-use url::Url;
 use std::hash::{Hash, Hasher};
+use url::Url;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Download {
