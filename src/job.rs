@@ -13,9 +13,10 @@ pub struct Job {
 
 impl Job {
     pub fn new(downloads: impl IntoIterator<Item = Download>) -> Self {
-        Self {
-            downloads: downloads.into_iter().collect(),
-        }
+        let mut downloads: Vec<_> = downloads.into_iter().collect();
+        downloads.sort_by_key(|x| x.idx);
+
+        Self { downloads }
     }
 
     pub fn execute(self, path: impl AsRef<Path>) {
