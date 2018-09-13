@@ -16,9 +16,7 @@ impl Application {
 
     pub fn run(self) -> Result<()> {
         use job::Job;
-        use std::fs::{self, OpenOptions};
-        use std::io::Write;
-        use std::sync::{Arc, Mutex};
+        use std::fs;
         use stopwatch::Stopwatch;
 
         let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
@@ -32,21 +30,9 @@ impl Application {
         // then take too long and time out. To limit this possibility, it may be best to process
         // a maximum number of hosts at any given time. I have no idea how to do that.
         crossbeam::scope(|scope| {
-            let log_path = self.config.log().to_owned();
-            let log = Arc::new(Mutex::new(move |message: &[u8]| {
-                let log = OpenOptions::new().append(true).write(true).open(&log_path);
-
-                if let Ok(mut log) = log {
-                    let _ = log.write_all(message);
-                }
-            }));
-
             let mut jobs = Vec::new();
             for (_host, download_set) in segregated_queues.into_iter() {
-                let log = log.clone();
-                jobs.push(
-                    scope.spawn(|| Job::new(download_set).execute(&self.config.youtube_dl, log)),
-                );
+                jobs.push(scope.spawn(|| Job::new(download_set).execute(&self.config.youtube_dl)));
             }
             jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
         });

@@ -57,13 +57,6 @@ impl Config {
 
         toml::from_str(&content).map_err(Error::config)
     }
-
-    pub fn log(&self) -> PathBuf {
-        match self.log {
-            None => rehome("~/Documents/download-log.txt").expect("FIXME: quit being lazy"),
-            Some(ref path) => rehome(path).expect("FIXME: seriously, though"),
-        }
-    }
 }
 
 fn rehome(path: &str) -> Result<PathBuf> {

@@ -1,10 +1,11 @@
+use chrono::Local;
 use download::Download;
 use rand::{self, Rng};
+use std::io::Write;
 use std::path::Path;
 use std::process::Command;
-use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::Duration;
+use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 pub struct Job {
     downloads: Vec<Download>,
@@ -17,31 +18,54 @@ impl Job {
         }
     }
 
-    pub fn execute(self, path: impl AsRef<Path>, log: Arc<Mutex<impl Fn(&[u8]) + 'static>>) {
-        let path = path.as_ref();
+    pub fn execute(self, path: impl AsRef<Path>) {
         let mut waiter = Waiter::new(33, 60);
 
         for item in self.downloads {
             waiter.wait();
 
             let url = item.url();
-            match Command::new(path).args(&["--no-progress", url]).output() {
+            match Command::new(path.as_ref())
+                .args(&["--no-progress", url])
+                .output()
+            {
                 Err(e) => {
                     eprintln!("Failed to execute process: {}", e);
                     return;
                 }
 
                 Ok(result) => {
-                    if !result.status.success() {
-                        eprintln!("Failed to download url:\n    {}", url);
-
-                        let log = log.lock().expect("Please don't get poisoned...");
-                        log(&result.stderr);
+                    if result.status.success() {
+                        print_success(url);
+                    } else {
+                        print_error(url);
                     }
                 }
             }
         }
     }
+}
+
+fn print_success(url: &str) {
+    {
+        let mut stream = StandardStream::stderr(ColorChoice::Always);
+        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
+        let _ = stream.write(b"[Success]");
+        let _ = stream.set_color(ColorSpec::new().set_fg(None));
+    }
+
+    println!(" {} {}", Local::now().format("%F %T"), url);
+}
+
+fn print_error(url: &str) {
+    {
+        let mut stream = StandardStream::stderr(ColorChoice::Always);
+        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
+        let _ = stream.write(b"[Failure]");
+        let _ = stream.set_color(ColorSpec::new().set_fg(None));
+    }
+
+    println!(" {} {}", Local::now().format("%F %T"), url);
 }
 
 struct Waiter {
@@ -60,6 +84,8 @@ impl Waiter {
     }
 
     fn wait(&mut self) {
+        use std::time::Duration;
+
         if self.first_time {
             self.first_time = false;
             return;
