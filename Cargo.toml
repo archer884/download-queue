@@ -6,6 +6,7 @@ authors = ["J/A <archer884@gmail.com>"]
 [dependencies]
 crossbeam = "0.4"
 dirs = "1.0"
+rand = "0.5"
 serde = "1.0"
 serde_derive = "1.0"
 stopwatch = "0.0"

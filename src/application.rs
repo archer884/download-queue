@@ -52,7 +52,7 @@ impl Application {
 
             for (_host, download_set) in segregated_queues.into_iter() {
                 let tx = tx.clone();
-                jobs.push(thread::spawn(move || Job::new(tx, download_set).execute()));
+                jobs.push(scope.spawn(|| Job::new(tx, download_set).execute(&self.config.youtube_dl)));
             }
 
             jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));

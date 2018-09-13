@@ -3,6 +3,7 @@ extern crate serde_derive;
 
 extern crate crossbeam;
 extern crate dirs;
+extern crate rand;
 extern crate stopwatch;
 extern crate structopt;
 extern crate toml;
