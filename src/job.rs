@@ -47,7 +47,7 @@ impl Job {
     }
 }
 
-fn print_success(url: &str) {
+fn print_success(line: usize, url: &str) {
     {
         let mut stream = StandardStream::stderr(ColorChoice::Always);
         let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
@@ -55,7 +55,7 @@ fn print_success(url: &str) {
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
 
-    println!(" {} {}", Local::now().format("%F %T"), url);
+    println!(" #{} {} {}", line, Local::now().format("%F %T"), url);
 }
 
 fn print_error(line: usize, url: &str) {
@@ -66,7 +66,7 @@ fn print_error(line: usize, url: &str) {
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
 
-    println!(" {} (line {}) {}", Local::now().format("%F %T"), line, url);
+    println!(" #{} {} {}", line, Local::now().format("%F %T"), url);
 }
 
 struct Waiter {
