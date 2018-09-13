@@ -49,7 +49,7 @@ impl Job {
 fn print_success(url: &str) {
     {
         let mut stream = StandardStream::stderr(ColorChoice::Always);
-        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
+        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
         let _ = stream.write(b"[Success]");
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
