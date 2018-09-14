@@ -1,11 +1,12 @@
 use chrono::Local;
-use download::Download;
 use rand::{self, Rng};
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use std::thread;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+
+use crate::download::Download;
 
 pub struct Job {
     downloads: Vec<Download>,

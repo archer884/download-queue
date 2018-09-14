@@ -1,6 +1,7 @@
-use error::*;
 use std::path::PathBuf;
 use structopt::StructOpt;
+
+use crate::error::{Error, Result};
 
 #[derive(Debug, StructOpt)]
 pub struct Command {

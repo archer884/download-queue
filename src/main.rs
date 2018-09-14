@@ -1,5 +1,3 @@
-#![feature(rust_2018_preview)]
-
 #[macro_use]
 extern crate serde_derive;
 
@@ -20,13 +18,12 @@ mod error;
 mod fmt;
 mod job;
 
-// Youtubed-dl location on macos
-// /usr/local/bin/youtube-dl
+use crate::{
+    application::Application,
+    config::*,
+};
 
 fn main() -> error::Result<()> {
-    use application::Application;
-    use config::*;
-
     let command = Command::from_args();
     let config = Config::new(&command)?;
 
