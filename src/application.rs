@@ -34,7 +34,7 @@ impl Application {
         crossbeam::scope(|scope| {
             let mut jobs = Vec::new();
             for (_host, download_set) in segregated_queues.into_iter() {
-                jobs.push(scope.spawn(|| Job::new(download_set).execute(&self.config.youtube_dl)));
+                jobs.push(scope.spawn(|| Job::new(download_set, self.command.no_wait).execute(&self.config.youtube_dl)));
             }
             jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
         });

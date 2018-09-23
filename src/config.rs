@@ -17,6 +17,9 @@ pub struct Command {
     /// Path to config file.
     #[structopt(short = "x", long = "config")]
     pub config: Option<String>,
+    /// Skip wait between downloads
+    #[structopt(short = "f", long = "no-wait")]
+    pub no_wait: bool,
 }
 
 impl Command {

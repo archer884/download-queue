@@ -9,21 +9,24 @@ use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 pub struct Job {
     downloads: Vec<Download>,
+    no_wait: bool,
 }
 
 impl Job {
-    pub fn new(downloads: impl IntoIterator<Item = Download>) -> Self {
+    pub fn new(downloads: impl IntoIterator<Item = Download>, no_wait: bool) -> Self {
         let mut downloads: Vec<_> = downloads.into_iter().collect();
         downloads.sort_by_key(|x| x.idx);
 
-        Self { downloads }
+        Self { downloads, no_wait }
     }
 
     pub fn execute(self, path: impl AsRef<Path>) {
         let mut waiter = Waiter::new(33, 60);
 
         for item in self.downloads {
-            waiter.wait();
+            if !self.no_wait {
+                waiter.wait();
+            }
 
             let url = item.url();
             match Command::new(path.as_ref())
