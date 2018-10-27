@@ -23,7 +23,7 @@ impl Application {
         let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
         let segregated_queues = build_queues(queue.lines());
 
-        format_job_stats(&segregated_queues);
+        print_job_stats(&segregated_queues);
 
         let start_time = Instant::now();
 
@@ -47,7 +47,7 @@ impl Application {
     }
 }
 
-fn format_job_stats(job: &HashMap<String, HashSet<Download>>) {
+fn print_job_stats(job: &HashMap<String, HashSet<Download>>) {
     let host_count = job.keys().count();
     let total_count: usize = job.values().map(|x| x.len()).sum();
 
