@@ -2,7 +2,7 @@ use error::Result;
 use std::hash::{Hash, Hasher};
 use url::Url;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq)]
 pub struct Download {
     pub idx: usize,
     pub host: String,
@@ -38,5 +38,11 @@ impl Download {
 impl Hash for Download {
     fn hash<H: Hasher>(&self, hasher: &mut H) {
         self.url.hash(hasher);
+    }
+}
+
+impl PartialEq for Download {
+    fn eq(&self, rhs: &Self) -> bool {
+        self.url == rhs.url
     }
 }
