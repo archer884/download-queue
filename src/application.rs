@@ -65,6 +65,7 @@ fn build_queues<'a>(
     let items = items
         .into_iter()
         .enumerate()
+        .filter(|x| !x.1.starts_with('#'))
         .map(|(idx, url)| (url.trim(), Download::with_index(idx, url)));
 
     for (url, item) in items {
