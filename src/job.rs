@@ -1,11 +1,11 @@
+use crate::download::Download;
 use chrono::Local;
-use download::Download;
-use rand::{self, Rng};
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
-use std::thread;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+
+mod waiter;
 
 pub struct Job {
     downloads: Vec<Download>,
@@ -21,6 +21,8 @@ impl Job {
     }
 
     pub fn execute(self, path: impl AsRef<Path>) {
+        use self::waiter::Waiter;
+
         let mut waiter = Waiter::new(33, 60);
 
         for item in self.downloads {
@@ -70,34 +72,4 @@ fn print_error(line: usize, url: &str) {
     }
 
     println!(" #{} {} {}", line, Local::now().format("%F %T"), url);
-}
-
-struct Waiter {
-    min: u32,
-    max: u32,
-    first_time: bool,
-}
-
-impl Waiter {
-    fn new(min: u32, max: u32) -> Self {
-        Self {
-            min,
-            max,
-            first_time: true,
-        }
-    }
-
-    fn wait(&mut self) {
-        use std::time::Duration;
-
-        if self.first_time {
-            self.first_time = false;
-            return;
-        }
-
-        let seconds = rand::thread_rng().gen_range(self.min, self.max);
-        let duration = Duration::from_secs(seconds.into());
-
-        thread::sleep(duration);
-    }
 }

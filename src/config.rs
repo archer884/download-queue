@@ -1,4 +1,5 @@
-use error::*;
+use crate::error::{Error, Result};
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use structopt::StructOpt;
 

@@ -1,8 +1,11 @@
-use config::*;
+use crate::{
+    config::*,
+    download::Download,
+    error::{Error, Result},
+    fmt::FormatDuration,
+    job::Job,
+};
 use crossbeam;
-use download::Download;
-use error::*;
-use fmt::FormatDuration;
 use std::collections::{HashMap, HashSet};
 
 pub struct Application {
@@ -16,7 +19,6 @@ impl Application {
     }
 
     pub fn run(self) -> Result<()> {
-        use job::Job;
         use std::fs;
         use std::time::Instant;
 
