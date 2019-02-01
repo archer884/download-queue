@@ -1,10 +1,9 @@
+use crate::download::Download;
 use chrono::Local;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-
-use crate::download::Download;
 
 mod waiter;
 
@@ -22,7 +21,7 @@ impl Job {
 
     pub fn execute(self, path: impl AsRef<Path>) {
         use self::waiter::Waiter;
-        
+
         let mut waiter = Waiter::new(33, 60);
 
         for item in self.downloads {

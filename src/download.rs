@@ -1,7 +1,6 @@
+use crate::error::Result;
 use std::hash::{Hash, Hasher};
 use url::Url;
-
-use crate::error::Result;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Download {
@@ -17,7 +16,7 @@ impl Download {
         let host = url
             .host_str()
             .ok_or("Unable to resolve host")?
-            .trim_left_matches("www.")
+            .trim_start_matches("www.")
             .to_owned();
 
         Ok(Download {

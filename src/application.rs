@@ -1,6 +1,3 @@
-use crossbeam;
-use std::collections::{HashMap, HashSet};
-
 use crate::{
     config::*,
     download::Download,
@@ -8,6 +5,8 @@ use crate::{
     fmt::FormatDuration,
     job::Job,
 };
+use crossbeam;
+use std::collections::{HashMap, HashSet};
 
 pub struct Application {
     config: Config,

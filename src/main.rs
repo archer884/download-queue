@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate serde_derive;
-
 mod application;
 mod config;
 mod download;
@@ -9,10 +6,7 @@ mod fmt;
 mod job;
 
 fn main() -> error::Result<()> {
-    use crate::{
-        application::Application,
-        config::*,
-    };
+    use crate::{application::Application, config::*};
 
     let command = Command::from_args();
     let config = Config::new(&command)?;
