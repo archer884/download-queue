@@ -5,6 +5,7 @@ version = "0.1.0"
 authors = ["J/A <archer884@gmail.com>"]
 
 [dependencies]
+atty = "0.2"
 chrono = "0.4"
 crossbeam = "0.7"
 dirs = "1.0"

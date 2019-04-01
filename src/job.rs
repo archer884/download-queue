@@ -23,6 +23,7 @@ impl Job {
         use self::waiter::Waiter;
 
         let mut waiter = Waiter::new(33, 60);
+        let formatter = ResultFormatter::new();
 
         for item in self.downloads {
             if !self.no_wait {
@@ -41,9 +42,9 @@ impl Job {
 
                 Ok(result) => {
                     if result.status.success() {
-                        print_success(item.idx, url);
+                        formatter.print_success(item.idx, url);
                     } else {
-                        print_error(item.idx, url);
+                        formatter.print_error(item.idx, url);
                     }
                 }
             }
@@ -51,22 +52,45 @@ impl Job {
     }
 }
 
-fn print_success(line: usize, url: &str) {
-    {
-        let mut stream = StandardStream::stdout(ColorChoice::Always);
-        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
-        let _ = stream.write(b"[Success]");
-        let _ = stream.set_color(ColorSpec::new().set_fg(None));
-    }
-    println!(" #{} {}", line, url);
+struct ResultFormatter {
+    stdout: bool,
+    stderr: bool,
 }
 
-fn print_error(line: usize, url: &str) {
-    {
-        let mut stream = StandardStream::stderr(ColorChoice::Always);
-        let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
-        let _ = stream.write(b"[Failure]");
-        let _ = stream.set_color(ColorSpec::new().set_fg(None));
+impl ResultFormatter {
+    fn new() -> Self {
+        use atty::Stream;
+        Self {
+            stdout: atty::is(Stream::Stdout),
+            stderr: atty::is(Stream::Stderr),
+        }
     }
-    eprintln!(" #{} {}", line, url);
+
+    fn print_success(&self, line: usize, url: &str) {
+        if self.stdout {
+            {
+                let mut stream = StandardStream::stdout(ColorChoice::Always);
+                let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
+                let _ = stream.write(b"[Success]");
+                let _ = stream.set_color(ColorSpec::new().set_fg(None));
+            }
+            println!(" #{} {}", line, url);
+        } else {
+            println!("#{} {}", line, url);
+        }
+    }
+
+    fn print_error(&self, line: usize, url: &str) {
+        if self.stderr {
+            {
+                let mut stream = StandardStream::stderr(ColorChoice::Always);
+                let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
+                let _ = stream.write(b"[Failure]");
+                let _ = stream.set_color(ColorSpec::new().set_fg(None));
+            }
+            eprintln!(" #{} {}", line, url);
+        } else {
+            eprintln!("#{} {}", line, url);
+        }
+    }
 }
