@@ -33,10 +33,10 @@ impl Application {
         // to be a problem if we connect to too many hosts at once; individual downloads could
         // then take too long and time out. To limit this possibility, it may be best to process
         // a maximum number of hosts at any given time. I have no idea how to do that.
-        crossbeam::scope(|scope| {
+        let _ = crossbeam::scope(|scope| {
             let mut jobs = Vec::new();
             for (_host, download_set) in segregated_queues.into_iter() {
-                jobs.push(scope.spawn(|| {
+                jobs.push(scope.spawn(|_| {
                     Job::new(download_set, self.command.no_wait).execute(&self.config.youtube_dl)
                 }));
             }

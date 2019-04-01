@@ -1,5 +1,4 @@
 use crate::download::Download;
-use chrono::Local;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
@@ -54,13 +53,12 @@ impl Job {
 
 fn print_success(line: usize, url: &str) {
     {
-        let mut stream = StandardStream::stderr(ColorChoice::Always);
+        let mut stream = StandardStream::stdout(ColorChoice::Always);
         let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
         let _ = stream.write(b"[Success]");
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
-
-    println!(" #{} {} {}", line, Local::now().format("%F %T"), url);
+    println!(" #{} {}", line, url);
 }
 
 fn print_error(line: usize, url: &str) {
@@ -70,6 +68,5 @@ fn print_error(line: usize, url: &str) {
         let _ = stream.write(b"[Failure]");
         let _ = stream.set_color(ColorSpec::new().set_fg(None));
     }
-
-    println!(" #{} {} {}", line, Local::now().format("%F %T"), url);
+    eprintln!(" #{} {}", line, url);
 }
