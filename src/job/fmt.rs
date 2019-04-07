@@ -39,7 +39,7 @@ impl ResultFormatter {
             }
             eprintln!(" #{} {}", line, url);
         } else {
-            eprintln!("#{} {}", line, url);
+            eprintln!("{}", url);
         }
     }
 }
