@@ -48,7 +48,6 @@ pub struct Config {
 impl Config {
     pub fn new(command: &Command) -> Result<Self> {
         use std::fs;
-        use toml;
 
         let path = command
             .config
@@ -64,8 +63,6 @@ impl Config {
 }
 
 fn rehome(path: &str) -> Result<PathBuf> {
-    use dirs;
-
     if path.starts_with("~/") {
         let mut full_path = dirs::home_dir().ok_or("Home directory not available")?;
         full_path.push(&path[2..]);

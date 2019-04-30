@@ -51,7 +51,7 @@ impl Application {
 
 fn print_job_stats(job: &HashMap<String, HashSet<Download>>) {
     let host_count = job.keys().count();
-    let total_count: usize = job.values().map(|x| x.len()).sum();
+    let total_count: usize = job.values().map(HashSet::len).sum();
 
     println!(
         "Downloading {} files from {} hosts.",
