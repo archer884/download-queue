@@ -1,11 +1,10 @@
 use crate::{
     config::*,
     download::Download,
-    error::{Error, Result},
+    error::Result,
     fmt::FormatDuration,
     job::Job,
 };
-use crossbeam;
 use std::collections::{HashMap, HashSet};
 
 pub struct Application {
@@ -22,26 +21,16 @@ impl Application {
         use std::fs;
         use std::time::Instant;
 
-        let queue = fs::read_to_string(&self.command.path).map_err(Error::schedule)?;
+        let queue = fs::read_to_string(&self.command.path)?;
         let segregated_queues = build_queues(queue.lines());
 
         print_job_stats(&segregated_queues);
 
         let start_time = Instant::now();
 
-        // FIXME: this represents an unbounded degree of concurrency. Such concurrency could prove
-        // to be a problem if we connect to too many hosts at once; individual downloads could
-        // then take too long and time out. To limit this possibility, it may be best to process
-        // a maximum number of hosts at any given time. I have no idea how to do that.
-        let _ = crossbeam::scope(|scope| {
-            let mut jobs = Vec::new();
-            for (_host, download_set) in segregated_queues.into_iter() {
-                jobs.push(scope.spawn(|_| {
-                    Job::new(download_set, self.command.no_wait).execute(&self.config.youtube_dl)
-                }));
-            }
-            jobs.into_iter().for_each(|job| job.join().expect("wtaf?"));
-        });
+        for (_host, downloads) in segregated_queues.into_iter() {
+            Job::new(downloads, self.command.no_wait).execute(&self.config.youtube_dl);
+        }
 
         let elapsed = Instant::now() - start_time;
         println!("Jobs complete in: {}", elapsed.format());

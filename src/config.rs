@@ -1,4 +1,4 @@
-use crate::error::{Error, Result};
+use crate::error::Result;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use structopt::StructOpt;
@@ -56,9 +56,9 @@ impl Config {
             .unwrap_or("~/.download-queue");
 
         let path = rehome(path)?;
-        let content = fs::read_to_string(path).map_err(Error::config)?;
+        let content = fs::read_to_string(path)?;
 
-        toml::from_str(&content).map_err(Error::config)
+        Ok(toml::from_str(&content)?)
     }
 }
 

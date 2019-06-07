@@ -2,40 +2,51 @@ use std::error;
 use std::fmt::{self, Display};
 use std::result;
 use url;
+use std::io;
 
 pub type Result<T> = result::Result<T, Error>;
 
 type Message = &'static str;
-type Cause = Box<error::Error>;
 
 #[derive(Debug)]
 pub enum Error {
-    Config(Cause),
-    Schedule(Cause),
-    Url(Cause),
+    Config(toml::de::Error),
+    IO(io::Error),
     Other(Message),
-}
-
-impl Error {
-    pub fn config(e: impl error::Error + 'static) -> Self {
-        Error::Config(Box::new(e))
-    }
-
-    pub fn schedule(e: impl error::Error + 'static) -> Self {
-        Error::Schedule(Box::new(e))
-    }
+    Url(url::ParseError),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use self::Error::*;
-
-        match *self {
-            Config(ref error) => writeln!(f, "Configuration unavailable: {}", error),
-            Schedule(ref error) => writeln!(f, "Invalid schedule: {}", error),
-            Url(ref error) => writeln!(f, "Invalid url: {}", error),
-            Other(message) => f.write_str(message),
+        match self {
+            Error::Config(e) => writeln!(f, "Configuration unavailable: {}", e),
+            Error::IO(e) => writeln!(f, "I/O error: {}", e),
+            Error::Other(e) => f.write_str(e),
+            Error::Url(e) => writeln!(f, "Unable to parse URL: {}", e),
         }
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            Error::Config(e) => Some(e),
+            Error::IO(e) => Some(e),
+            Error::Url(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(e: io::Error) -> Self {
+        Error::IO(e)
+    }
+}
+
+impl From<toml::de::Error> for Error {
+    fn from(e: toml::de::Error) -> Self {
+        Error::Config(e)
     }
 }
 
@@ -47,6 +58,6 @@ impl From<Message> for Error {
 
 impl From<url::ParseError> for Error {
     fn from(e: url::ParseError) -> Self {
-        Error::Url(Box::new(e))
+        Error::Url(e)
     }
 }
