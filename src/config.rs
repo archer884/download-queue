@@ -1,5 +1,6 @@
 use crate::error::Result;
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -26,6 +27,10 @@ pub struct Command {
 impl Command {
     pub fn from_args() -> Self {
         StructOpt::from_args()
+    }
+
+    pub fn path(&self) -> &Path {
+        self.path.as_ref()
     }
 }
 

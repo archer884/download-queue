@@ -1,8 +1,8 @@
 use std::error;
 use std::fmt::{self, Display};
+use std::io;
 use std::result;
 use url;
-use std::io;
 
 pub type Result<T> = result::Result<T, Error>;
 

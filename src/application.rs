@@ -1,10 +1,4 @@
-use crate::{
-    config::*,
-    download::Download,
-    error::Result,
-    fmt::FormatDuration,
-    job::Job,
-};
+use crate::{config::*, download::Download, error::Result, fmt::FormatDuration, job::Job};
 use std::collections::{HashMap, HashSet};
 
 pub struct Application {
@@ -33,7 +27,14 @@ impl Application {
         }
 
         let elapsed = Instant::now() - start_time;
-        println!("Jobs complete in: {}", elapsed.format());
+        let filename = self
+            .command
+            .path()
+            .file_name()
+            .expect("path must refer to a file")
+            .to_string_lossy();
+
+        println!("{} complete in: {}", filename, elapsed.format());
         Ok(())
     }
 }
