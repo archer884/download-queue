@@ -1,34 +1,39 @@
-use crate::{config::*, download::Download, error::Result, fmt::FormatDuration, job::Job};
+use crate::{download::Download, error::Result, fmt::FormatDuration, job::Job, opt::Opt};
 use std::collections::{HashMap, HashSet};
 
 pub struct Application {
-    config: Config,
-    command: Command,
+    options: Opt,
 }
 
 impl Application {
-    pub fn new(config: Config, command: Command) -> Self {
-        Self { config, command }
+    pub fn new(options: Opt) -> Self {
+        Self { options }
     }
 
     pub fn run(self) -> Result<()> {
         use std::fs;
         use std::time::Instant;
 
-        let queue = fs::read_to_string(&self.command.path)?;
+        let queue = fs::read_to_string(&self.options.path)?;
         let segregated_queues = build_queues(queue.lines());
 
         print_job_stats(&segregated_queues);
 
         let start_time = Instant::now();
+        let youtube_dl = self
+            .options
+            .youtube_dl
+            .as_ref()
+            .map(AsRef::as_ref)
+            .unwrap_or("youtube-dl");
 
         for (_host, downloads) in segregated_queues.into_iter() {
-            Job::new(downloads, self.command.no_wait).execute(&self.config.youtube_dl);
+            Job::new(downloads, self.options.no_wait).execute(youtube_dl);
         }
 
         let elapsed = Instant::now() - start_time;
         let filename = self
-            .command
+            .options
             .path()
             .file_name()
             .expect("path must refer to a file")

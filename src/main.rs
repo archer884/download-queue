@@ -1,15 +1,13 @@
 mod application;
-mod config;
 mod download;
 mod error;
 mod fmt;
 mod job;
+mod opt;
 
 fn main() -> error::Result<()> {
-    use crate::{application::Application, config::*};
+    use application::Application;
+    use opt::Opt;
 
-    let command = Command::from_args();
-    let config = Config::new(&command)?;
-
-    Application::new(config, command).run()
+    Application::new(Opt::from_args()).run()
 }
