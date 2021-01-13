@@ -7,12 +7,10 @@ authors = ["J/A <archer884@gmail.com>"]
 [dependencies]
 atty = "0.2.14"
 chrono = "0.4.19"
-dirs = "3.0.1"
-rand = "0.8.2"
-serde = { version = "1.0.119", features = ["derive"] }
-stopwatch = "0.0.7"
-toml = "0.5.8"
-url = "2.2.0"
-hashbrown = "0.9.1"
-colored = "2.0.0"
 clap = "3.0.0-beta.2"
+colored = "2.0.0"
+dirs = "3.0.1"
+hashbrown = "0.9.1"
+rand = "0.8.2"
+stopwatch = "0.0.7"
+url = "2.2.0"

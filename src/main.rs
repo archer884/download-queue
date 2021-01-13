@@ -1,17 +1,13 @@
 mod application;
-mod config;
 mod download;
 mod error;
 mod fmt;
 mod job;
+mod opts;
 
 use application::Application;
-use config::{Command, Config};
+use opts::Opts;
 
-pub type Result<T, E = error::Error> = std::result::Result<T, E>;
-
-fn main() -> Result<()> {
-    let command = Command::parse();
-    let config = Config::new(&command)?;
-    Application::new(config, command).run()
+fn main() -> error::Result<()> {
+    Application::new(Opt::from_args()).run()
 }
