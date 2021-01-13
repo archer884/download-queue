@@ -8,6 +8,8 @@ mod opts;
 use application::Application;
 use opts::Opts;
 
-fn main() -> error::Result<()> {
-    Application::new(Opt::from_args()).run()
+type Result<T, E = error::Error> = std::result::Result<T, E>;
+
+fn main() -> Result<()> {
+    Application::new(Opts::parse()).run()
 }

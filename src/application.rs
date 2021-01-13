@@ -1,3 +1,5 @@
+use std::{fs, time::Instant};
+
 use hashbrown::{HashMap, HashSet};
 
 use crate::{download::Download, fmt::FormatDuration, job::Job, opts::Opts};
@@ -12,9 +14,6 @@ impl Application {
     }
 
     pub fn run(self) -> crate::Result<()> {
-        use std::fs;
-        use std::time::Instant;
-
         let queue = fs::read_to_string(&self.options.path)?;
         let segregated_queues = build_queues(queue.lines());
 
