@@ -1,5 +1,4 @@
-use std::io::Write;
-use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use colored::Colorize;
 
 pub struct ResultFormatter {
     stdout: bool,
@@ -17,13 +16,7 @@ impl ResultFormatter {
 
     pub fn print_success(&self, line: usize, url: &str) {
         if self.stdout {
-            {
-                let mut stream = StandardStream::stdout(ColorChoice::Always);
-                let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Green)));
-                let _ = stream.write(b"[Success]");
-                let _ = stream.set_color(ColorSpec::new().set_fg(None));
-            }
-            println!(" #{} {}", line, url);
+            println!("{} #{} {}", "[Success]".green(), line, url);
         } else {
             println!("#{} {}", line, url);
         }
@@ -31,13 +24,7 @@ impl ResultFormatter {
 
     pub fn print_error(&self, line: usize, url: &str) {
         if self.stderr {
-            {
-                let mut stream = StandardStream::stderr(ColorChoice::Always);
-                let _ = stream.set_color(ColorSpec::new().set_fg(Some(Color::Red)));
-                let _ = stream.write(b"[Failure]");
-                let _ = stream.set_color(ColorSpec::new().set_fg(None));
-            }
-            eprintln!(" #{} {}", line, url);
+            eprintln!("{} #{} {}", "[Failure]".red(), line, url);
         } else {
             eprintln!("{}", url);
         }

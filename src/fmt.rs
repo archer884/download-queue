@@ -1,5 +1,7 @@
-use std::fmt::{self, Display};
-use std::time::Duration;
+use std::{
+    fmt::{self, Display},
+    time::Duration,
+};
 
 pub struct DurationFormatter(Duration);
 

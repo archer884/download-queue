@@ -1,32 +1,32 @@
-use crate::error::Result;
-use serde::{Deserialize, Serialize};
-use std::path::Path;
-use std::path::PathBuf;
-use structopt::StructOpt;
+use std::path::{Path, PathBuf};
 
-#[derive(Debug, StructOpt)]
+use clap::{Clap, crate_authors, crate_description, crate_version};
+use serde::{Deserialize, Serialize};
+
+#[derive(Clap, Clone, Debug)]
+#[clap(author = crate_authors!(), version = crate_version!(), about = crate_description!())]
 pub struct Command {
     /// Path to a list of files to be downloaded.
     pub path: String,
     /// Path to the folder where downloads will be stored.
     ///
     /// Warning: not implemented.
-    #[structopt(short = "d", long = "downloads")]
+    #[clap(short, long)]
     pub downloads: Option<String>,
     /// Path to youtube-dl binary.
-    #[structopt(short = "y", long = "youtube-dl")]
+    #[clap(short = 'y', long = "youtube-dl")]
     pub youtube_dl: Option<String>,
     /// Path to config file.
-    #[structopt(short = "x", long = "config")]
+    #[clap(short = 'x', long = "config")]
     pub config: Option<String>,
     /// Skip wait between downloads
-    #[structopt(short = "f", long = "no-wait")]
+    #[clap(short = 'f', long = "no-wait")]
     pub no_wait: bool,
 }
 
 impl Command {
-    pub fn from_args() -> Self {
-        StructOpt::from_args()
+    pub fn parse() -> Self {
+        Clap::parse()
     }
 
     pub fn path(&self) -> &Path {
@@ -51,7 +51,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(command: &Command) -> Result<Self> {
+    pub fn new(command: &Command) -> crate::Result<Self> {
         use std::fs;
 
         let path = command
@@ -67,7 +67,7 @@ impl Config {
     }
 }
 
-fn rehome(path: &str) -> Result<PathBuf> {
+fn rehome(path: &str) -> crate::Result<PathBuf> {
     if path.starts_with("~/") {
         let mut full_path = dirs::home_dir().ok_or("Home directory not available")?;
         full_path.push(&path[2..]);

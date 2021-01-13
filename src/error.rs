@@ -1,10 +1,8 @@
-use std::error;
-use std::fmt::{self, Display};
-use std::io;
-use std::result;
-use url;
-
-pub type Result<T> = result::Result<T, Error>;
+use std::{
+    error,
+    fmt::{self, Display},
+    io,
+};
 
 type Message = &'static str;
 

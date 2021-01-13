@@ -1,5 +1,5 @@
-use crate::error::Result;
 use std::hash::{Hash, Hasher};
+
 use url::Url;
 
 #[derive(Debug, Eq)]
@@ -10,7 +10,7 @@ pub struct Download {
 }
 
 impl Download {
-    pub fn with_index(idx: usize, s: &str) -> Result<Self> {
+    pub fn with_index(idx: usize, s: &str) -> crate::Result<Self> {
         let s = s.trim();
         let url = Url::parse(s)?;
         let host = url

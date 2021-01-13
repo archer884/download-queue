@@ -1,5 +1,6 @@
-use crate::{config::*, download::Download, error::Result, fmt::FormatDuration, job::Job};
-use std::collections::{HashMap, HashSet};
+use hashbrown::{HashMap, HashSet};
+
+use crate::{config::*, download::Download, fmt::FormatDuration, job::Job};
 
 pub struct Application {
     config: Config,
@@ -11,7 +12,7 @@ impl Application {
         Self { config, command }
     }
 
-    pub fn run(self) -> Result<()> {
+    pub fn run(self) -> crate::Result<()> {
         use std::fs;
         use std::time::Instant;
 

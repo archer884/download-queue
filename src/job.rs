@@ -1,9 +1,9 @@
-use crate::download::Download;
-use std::path::Path;
-use std::process::Command;
+use std::{path::Path, process::Command};
 
 mod fmt;
 mod waiter;
+
+use crate::download::Download;
 
 pub struct Job {
     downloads: Vec<Download>,

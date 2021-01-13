@@ -5,11 +5,13 @@ mod error;
 mod fmt;
 mod job;
 
-fn main() -> error::Result<()> {
-    use crate::{application::Application, config::*};
+use application::Application;
+use config::{Command, Config};
 
-    let command = Command::from_args();
+pub type Result<T, E = error::Error> = std::result::Result<T, E>;
+
+fn main() -> Result<()> {
+    let command = Command::parse();
     let config = Config::new(&command)?;
-
     Application::new(config, command).run()
 }
