@@ -1,10 +1,10 @@
 use std::path::Path;
 
-use clap::{crate_authors, crate_description, crate_version, Clap};
+use clap::{crate_authors, crate_description, crate_version, Parser};
 
 // FIXME: These wait time parameters are presently ignored.
 
-#[derive(Clap, Clone, Debug)]
+#[derive(Clone, Debug, Parser)]
 #[clap(author = crate_authors!(), version = crate_version!(), about = crate_description!())]
 pub struct Opts {
     /// Path to a list of files to be downloaded.
@@ -27,7 +27,7 @@ pub struct Opts {
 
 impl Opts {
     pub fn parse() -> Self {
-        Clap::parse()
+        Parser::parse()
     }
 
     pub fn path(&self) -> &Path {

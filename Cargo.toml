@@ -1,5 +1,5 @@
 [package]
-edition = '2018'
+edition = '2021'
 name = "download-queue"
 version = "0.2.1"
 authors = ["J/A <archer884@gmail.com>"]
@@ -7,10 +7,10 @@ authors = ["J/A <archer884@gmail.com>"]
 [dependencies]
 atty = "0.2.14"
 chrono = "0.4.19"
-clap = "3.0.0-beta.2"
+clap = { git = "https://github.com/clap-rs/clap" }
 colored = "2.0.0"
-dirs = "3.0.1"
-hashbrown = "0.9.1"
-rand = "0.8.2"
+dirs = "4.0.0"
+hashbrown = "0.11.2"
+rand = "0.8.4"
 stopwatch = "0.0.7"
-url = "2.2.0"
+url = "2.2.2"
