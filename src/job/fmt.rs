@@ -1,4 +1,4 @@
-use colored::Colorize;
+use owo_colors::OwoColorize;
 
 pub struct ResultFormatter {
     stdout: bool,

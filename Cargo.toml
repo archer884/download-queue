@@ -8,9 +8,9 @@ authors = ["J/A <archer884@gmail.com>"]
 atty = "0.2.14"
 chrono = "0.4.19"
 clap = { git = "https://github.com/clap-rs/clap" }
-colored = "2.0.0"
 dirs = "4.0.0"
 hashbrown = "0.11.2"
+owo-colors = "3.0.1"
 rand = "0.8.4"
 stopwatch = "0.0.7"
 url = "2.2.2"
